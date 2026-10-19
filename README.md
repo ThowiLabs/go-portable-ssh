@@ -118,3 +118,19 @@ go vet ./...
 La suite utiliza servidores SSH efímeros locales, sin acceder a servidores ajenos.
 
 **Licencia:** 0BSD. Consulta `LICENSE`.
+
+## Subir archivos con preservación de permisos
+
+`Upload` transfiere un archivo regular desde el equipo local usando la conexión SSH existente. Calcula SHA-256 antes del envío y lo verifica antes de instalarlo en el destino. Utiliza un temporal de acceso restringido y reemplazo atómico.
+
+```go
+result, err := client.Upload(ctx, portablessh.UploadOptions{
+    LocalPath: "./config.conf",
+    RemotePath: "/root/mi-aplicacion/config.conf",
+    Overwrite: true,
+})
+```
+
+El modo de privilegio es **`auto` por defecto**: usa el usuario SSH cuando tiene permisos y recurre a `sudo -n` cuando el destino lo requiere. No habilita ni utiliza el inicio de sesión SSH como `root`. Se puede deshabilitar la elevación con `Privilege: portablessh.PrivilegeNever` o exigirla con `PrivilegeSudo`.
+
+En sobrescrituras conserva propietario, grupo y permisos Unix del archivo destino; para archivos nuevos usa `Mode` (por defecto `0644`) y toma propietario/grupo del directorio cuando requiere elevación. Rechaza destinos simbólicos o no regulares y no sobrescribe por defecto. Requiere un host GNU/Linux con `sh`, `mktemp`, `install`, `stat` y `sha256sum`, además de `sudo` sin contraseña cuando se requiera elevación. No garantiza preservar ACL, etiquetas SELinux, atributos extendidos o permisos especiales fuera de los bits Unix; estos casos deben gestionarse mediante el despliegue del sistema.
