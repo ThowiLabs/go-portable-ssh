@@ -1,0 +1,29 @@
+# Local build artifacts
+/bin/
+/dist/
+*.test
+*.out
+coverage.out
+
+# Local secrets and environment
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+*.pfx
+id_rsa
+id_ed25519
+
+# Editor files
+.DS_Store
+.vscode/
+.idea/
+
+# Contexto local descifrado (no publicar)
+/contexto/
+/tareas/
+/contexto.md
+/.agents-*.tmp
+/.agents-restore-*/
